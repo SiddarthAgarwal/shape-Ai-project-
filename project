@@ -1,0 +1,41 @@
+from docx import Document
+import requests
+
+def convert_doc_to_descriptive_form(file_url):
+    # Download the doc file
+    response = requests.get(file_url)
+    file_path = "temp.docx"
+    with open(file_path, "wb") as file:
+        file.write(response.content)
+
+    # Process the doc file
+    doc = Document(file_path)
+    descriptive_content = ""
+
+    for paragraph in doc.paragraphs:
+        content = paragraph.text
+        descriptive_content += convert_symbols_and_equations(content) + "\n"
+
+    # Delete the temporary doc file
+    os.remove(file_path)
+
+    return descriptive_content
+
+def convert_symbols_and_equations(content):
+    content = content.replace("d=", "The value of d is equal to ")
+    content = content.replace("D=", "The value of D is equal to ")
+    content = content.replace("x=", "The position of x is ")
+    content = content.replace("dB=", "The value of dB is ")
+    content = content.replace("y=", "The position of y is ")
+    content = content.replace("separation =", "The separation is equal to ")
+    content = content.replace("λ=", "The wavelength (lambda) is ")
+    content = content.replace("μ", "micrometers")
+    content = content.replace("×", "times")
+    content = content.replace("−", "negative")
+
+    return content
+
+# Usage
+file_url = "https://example.com/path/to/your/doc/file.docx"
+descriptive_content = convert_doc_to_descriptive_form(file_url)
+print(descriptive_content)
